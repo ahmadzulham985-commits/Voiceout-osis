@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoiceOut — Kotak Saran Digital OSIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#f5f6fa;--card:#fff;--inp:#eef0f6;
+  --b:rgba(0,0,0,.08);--bm:rgba(0,0,0,.13);
+  --ind:#5046e5;--ind-d:rgba(80,70,229,.09);--ind-g:rgba(80,70,229,.22);
+  --grn:#16a34a;--amb:#d97706;--red:#dc2626;--red-d:rgba(220,38,38,.08);
+  --t1:#111827;--t2:rgba(17,24,39,.55);--t3:rgba(17,24,39,.35);
+  --sc:0 1px 3px rgba(0,0,0,.07),0 4px 14px rgba(0,0,0,.05);
+  --sl:0 8px 30px rgba(0,0,0,.1);
+  --rs:6px;--rm:12px;--rl:16px;--rx:20px;--r2:28px;--pill:999px;
+  --t:.18s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--t1);font-family:'Inter',-apple-system,sans-serif;font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--b);box-shadow:var(--sc)}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.osis-logo{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  overflow:hidden; /* penting biar crop bulat */
+  background:none; /* HAPUS background merah */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.brand-name{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-.3px}
+#tb-right{display:flex;align-items:center;gap:8px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:var(--rm);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:var(--t);border:none;outline:none;white-space:nowrap}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--b)}
+.btn-ghost:hover{background:var(--inp);color:var(--t1);border-color:var(--bm)}
+.btn-primary{background:var(--ind);color:#fff}
+.btn-primary:hover{background:#3d32cc;transform:translateY(-1px);box-shadow:0 4px 16px var(--ind-g)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-full{width:100%}
+.btn-sm{padding:7px 13px;font-size:12px;border-radius:var(--rs)}
+
+/* PAGE */
+.page{max-width:740px;margin:0 auto;padding:72px 20px 80px}
+
+/* LOGIN */
+#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px}
+.login-hero{text-align:center;margin-bottom:36px;animation:fadeUp .6s ease both}
+.login-badge{display:inline-flex;align-items:center;gap:8px;background:var(--ind-d);border:1px solid rgba(80,70,229,.22);color:var(--ind);font-size:11px;font-weight:700;padding:5px 14px;border-radius:var(--pill);letter-spacing:.07em;text-transform:uppercase;margin-bottom:22px}
+.bdot{width:5px;height:5px;border-radius:50%;background:var(--ind);animation:pulse 2s infinite}
+.login-hero h1{font-size:clamp(2rem,5vw,2.9rem);font-weight:700;letter-spacing:-.04em;line-height:1.1;color:var(--t1);margin-bottom:12px}
+.login-hero h1 span{color:var(--ind)}
+.login-hero p{font-size:15px;color:var(--t2);max-width:370px;margin:0 auto;line-height:1.75}
+.login-card{background:var(--card);border:1px solid var(--bm);border-radius:var(--r2);padding:8px;width:100%;max-width:440px;box-shadow:var(--sl);animation:fadeUp .7s .08s ease both}
+.rs-label{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;padding:12px 14px 8px;display:block}
+.role-item{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:var(--rl);cursor:pointer;transition:var(--t);border:1px solid transparent;background:transparent;width:100%;text-align:left;font-family:inherit}
+.role-item:hover{background:var(--inp);border-color:var(--b)}
+.role-item:active{transform:scale(.98)}
+.ri{width:42px;height:42px;border-radius:var(--rm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ri-s{background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.18)}
+.ri-o{background:var(--ind-d);border:1px solid rgba(80,70,229,.18)}
+.ri-g{background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.18)}
+.rib{flex:1;min-width:0}
+.rit{font-size:14px;font-weight:700;color:var(--t1);display:block;line-height:1.3}
+.ris{font-size:12px;color:var(--t3);margin-top:2px;display:block}
+.rarr{color:var(--t3);flex-shrink:0;transition:transform var(--t),color var(--t)}
+.role-item:hover .rarr{transform:translateX(3px);color:var(--t2)}
+.rdiv{height:1px;background:var(--b);margin:4px 12px}
+#adminForm{display:none;padding:16px 8px 8px}
+.afh{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.aft{font-size:14px;font-weight:700;color:var(--t1)}
+.fg{margin-bottom:13px}
+.fl{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px;letter-spacing:.02em}
+.fi{width:100%;padding:11px 14px;border-radius:var(--rm);border:1px solid var(--bm);background:var(--inp);color:var(--t1);font-family:inherit;font-size:14px;outline:none;transition:var(--t)}
+.fi::placeholder{color:var(--t3)}
+.fi:focus{border-color:var(--ind);box-shadow:0 0 0 3px var(--ind-d)}
+
+/* APP */
+#appScreen{display:none}
+.app-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;animation:fadeUp .5s ease both}
+.app-hdr-l h1{font-size:clamp(1.4rem,3.8vw,2rem);font-weight:700;letter-spacing:-.04em;line-height:1.15;color:var(--t1)}
+.app-hdr-l h1 span{color:var(--ind)}
+.app-hdr-l p{font-size:13px;color:var(--t2);margin-top:4px}
+.upill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 10px;border-radius:var(--pill);border:1px solid var(--b);background:var(--card);flex-shrink:0;box-shadow:var(--sc)}
+.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pdot.green{background:var(--grn);box-shadow:0 0 0 2px rgba(22,163,74,.2)}
+.pdot.indigo{background:var(--ind);box-shadow:0 0 0 2px rgba(80,70,229,.2)}
+.pdot.amber{background:var(--amb);box-shadow:0 0 0 2px rgba(217,119,6,.2)}
+.pname{font-size:12px;font-weight:600;color:var(--t2)}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--b);border-radius:var(--rx);padding:22px;margin-bottom:14px;box-shadow:var(--sc);transition:border-color var(--t);animation:fadeUp .5s ease both}
+.card:hover{border-color:var(--bm)}
+.card:nth-child(2){animation-delay:.06s}
+.card:nth-child(3){animation-delay:.12s}
+.chdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.ctit{font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em}
+
+/* COMPOSE */
+.cwrap{position:relative}
+#message{width:100%;min-height:118px;padding:15px 15px 40px;border-radius:var(--rl);border:1px solid var(--bm);background:var(--inp);color:var(--t1);font-family:inherit;font-size:14px;line-height:1.75;resize:none;outline:none;transition:var(--t)}
+#message::placeholder{color:var(--t3)}
+#message:focus{border-color:var(--ind);box-shadow:0 0 0 3px var(--ind-d)}
+.cbottom{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;display:flex;justify-content:flex-end;pointer-events:none}
+.cc{font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums}
+.cc.warn{color:var(--amb)}
+.uzone{border:1.5px dashed rgba(80,70,229,.2);border-radius:var(--rl);padding:18px;text-align:center;cursor:pointer;position:relative;transition:var(--t);margin-top:12px;background:var(--inp)}
+.uzone:hover{border-color:var(--ind);background:var(--ind-d)}
+.uzone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uzi{pointer-events:none}
+.uzi svg{display:block;margin:0 auto 6px;opacity:.5}
+.uzt{font-size:13px;color:var(--t2)}
+.uzt strong{color:var(--ind);font-weight:600}
+.uzh{font-size:11px;color:var(--t3);margin-top:3px}
+#prevWrap{display:none;position:relative;margin-top:12px;border-radius:var(--rl);overflow:hidden;background:var(--inp)}
+#imgPrev{width:100%;max-height:210px;object-fit:cover;display:block}
+#prevBar{position:absolute;top:9px;right:9px;display:flex;gap:7px}
+.pbadge{background:rgba(0,0,0,.65);color:rgba(255,255,255,.6);border-radius:6px;padding:4px 10px;font-size:11px}
+.brm{background:rgba(0,0,0,.65);color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;border:none;transition:var(--t)}
+.brm:hover{background:rgba(0,0,0,.85)}
+.cact{display:flex;gap:10px;margin-top:12px}
+
+/* STATS */
+.bgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:480px){.bgrid{grid-template-columns:repeat(2,1fr)}}
+.btile{background:var(--inp);border:1px solid var(--b);border-radius:var(--rl);padding:15px 12px;text-align:center;transition:var(--t)}
+.btile:hover{border-color:var(--bm);transform:translateY(-2px)}
+.bnum{font-size:1.7rem;font-weight:700;letter-spacing:-.04em;color:var(--t1);display:block;line-height:1;margin-bottom:5px}
+.bnum.hi{color:var(--ind)}
+.blbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em}
+.cwrap2{height:118px;position:relative}
+
+/* FEED */
+.fhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.flbl{font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em}
+.fcnt{font-size:11px;color:var(--t3);background:var(--inp);border:1px solid var(--b);border-radius:var(--pill);padding:4px 11px}
+
+/* POST */
+.post{background:var(--card);border:1px solid var(--b);border-radius:var(--rx);padding:20px;margin-bottom:12px;transition:border-color var(--t),box-shadow var(--t);animation:fadeUp .4s ease both}
+.post:hover{border-color:var(--bm);box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.ptop{display:flex;align-items:flex-start;gap:12px;margin-bottom:13px}
+.pav{width:36px;height:36px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#fff}
+.av-s{background:linear-gradient(135deg,#5046e5,#7c68ee)}
+.av-o{background:linear-gradient(135deg,#0ea5e9,#3b82f6)}
+.av-g{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.pm strong{font-size:13px;font-weight:700;color:var(--t1);display:block;line-height:1.3}
+.pm time{font-size:11px;color:var(--t3)}
+.rb{display:inline-flex;align-items:center;padding:2px 7px;border-radius:var(--pill);font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-left:5px}
+.rb-s{background:rgba(80,70,229,.1);color:#5046e5}
+.rb-o{background:rgba(14,165,233,.1);color:#0ea5e9}
+.rb-g{background:rgba(245,158,11,.1);color:#d97706}
+.pbody{font-size:14px;line-height:1.8;color:var(--t2);margin-bottom:13px;white-space:pre-wrap;word-break:break-word}
+.pimg{width:100%;max-height:290px;object-fit:cover;border-radius:var(--rm);margin-bottom:13px;cursor:zoom-in;display:block;border:1px solid var(--b);transition:opacity var(--t)}
+.pimg:hover{opacity:.86}
+.pact{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.ab{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:var(--rm);border:1px solid var(--b);background:transparent;color:var(--t2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:var(--t)}
+.ab:hover{background:var(--inp);border-color:var(--bm);color:var(--t1)}
+.ab.del{color:var(--red);border-color:rgba(220,38,38,.18)}
+.ab.del:hover{background:var(--red-d);border-color:rgba(220,38,38,.32)}
+.cs{margin-top:15px;padding-top:15px;border-top:1px solid var(--b)}
+.cl{display:flex;flex-direction:column;gap:7px;margin-bottom:11px}
+.ci{padding:9px 13px;background:var(--inp);border:1px solid var(--b);border-radius:var(--rm);font-size:12px;line-height:1.7;color:var(--t2)}
+.cb{display:inline-flex;align-items:center;padding:1px 6px;border-radius:var(--pill);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-right:5px;vertical-align:middle}
+.crow{display:flex;gap:8px}
+.cinp{flex:1;padding:9px 13px;border-radius:var(--rm);border:1px solid var(--bm);background:var(--inp);color:var(--t1);font-family:inherit;font-size:12px;outline:none;transition:var(--t)}
+.cinp::placeholder{color:var(--t3)}
+.cinp:focus{border-color:var(--ind);box-shadow:0 0 0 3px var(--ind-d)}
+
+/* EMPTY */
+.empty{text-align:center;padding:52px 24px;border:1px dashed var(--bm);border-radius:var(--rx);background:var(--inp)}
+.empty h3{font-size:15px;font-weight:700;color:var(--t2);margin-bottom:5px}
+.empty p{font-size:13px;color:var(--t3)}
+
+/* LIGHTBOX */
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:9000;padding:20px;cursor:zoom-out;backdrop-filter:blur(8px)}
+#lbimg{max-width:100%;max-height:92vh;border-radius:var(--rl);cursor:auto;box-shadow:0 32px 80px rgba(0,0,0,.6)}
+#lbx{position:absolute;top:18px;right:18px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t)}
+#lbx:hover{background:rgba(255,255,255,.25)}
+
+/* TOAST & LOADER */
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(17,24,39,.96);color:#fff;padding:10px 22px;border-radius:var(--pill);font-size:13px;font-weight:500;z-index:8000;pointer-events:none;opacity:0;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:var(--sl);backdrop-filter:blur(12px);max-width:calc(100vw - 40px)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#lov{position:fixed;inset:0;background:rgba(245,246,250,.82);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:7000;backdrop-filter:blur(6px)}
+#lov.on{display:flex}
+.lr{width:40px;height:40px;border:3px solid rgba(80,70,229,.15);border-top-color:var(--ind);border-radius:50%;animation:spin .7s linear infinite}
+#lmsg{font-size:13px;color:var(--t2);font-weight:600}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:600px){.page{padding:68px 14px 60px}#topbar{padding:0 16px}.card,.login-card{padding:16px}.post{padding:15px}.app-hdr{flex-direction:column;gap:10px}}
+</style>
+</head>
+<body>
+
+<div id="lb" onclick="cLB(event)">
+  <button id="lbx" onclick="cLB()">✕</button>
+  <img id="lbimg" src="" alt="" onclick="event.stopPropagation()">
+</div>
+<div id="lov"><div class="lr"></div><span id="lmsg">Memproses...</span></div>
+<div id="toast"></div>
+
+<!-- TOPBAR -->
+<header id="topbar">
+  <div class="brand">
+    <div class="osis-logo">
+      <div class="osis-logo">
+  <img src="osis.png" style="width:40px;height:40px;border-radius:50%">
+</div>
+        <circle cx="16" cy="16" r="14" stroke="#fcd34d" stroke-width="1.2" fill="none" opacity=".75"/>
+        <path d="M16 6.5L17.6 13.8L24.5 11.8L19.2 17L24.5 22.2L16.8 20.5L16 27L15.2 20.5L7.5 22.2L12.8 17L7.5 11.8L14.4 13.8Z" fill="#fcd34d" opacity=".95"/>
+        <circle cx="16" cy="16.5" r="3" fill="#fff" opacity=".9"/>
+      </svg>
+    </div>
+    <span class="brand-name">VoiceOut OSIS</span>
+  </div>
+  <div id="tb-right"></div>
+</header>
+
+<!-- LOGIN SCREEN -->
+<div class="page" id="loginScreen">
+  <div class="login-hero">
+    <div class="login-badge"><span class="bdot"></span>Platform Aspirasi OSIS</div>
+    <h1>Suaramu Penting<br><span>Bagi Kami</span></h1>
+    <p>Sampaikan saran dan kritikmu secara anonim. Setiap pendapat berharga dan didengar.</p>
+  </div>
+
+  <div class="login-card">
+    <div id="roleChoice">
+      <span class="rs-label">Pilih akses masuk</span>
+      <button class="role-item" onclick="enterStudent()">
+        <div class="ri ri-s"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="rib">
+          <span class="rit">Masuk sebagai Siswa</span>
+          <span class="ris">Anonim · Saran hanya kamu yang bisa lihat</span>
+        </div>
+        <svg class="rarr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="rdiv"></div>
+      <button class="role-item" onclick="showAdminForm('osis')">
+        <div class="ri ri-o"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5046e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="rib">
+          <span class="rit">Login sebagai OSIS</span>
+          <span class="ris">Lihat &amp; kelola semua saran siswa</span>
+        </div>
+        <svg class="rarr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button class="role-item" onclick="showAdminForm('guru')">
+        <div class="ri ri-g"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+        <div class="rib">
+          <span class="rit">Login sebagai Guru</span>
+          <span class="ris">Moderasi konten &amp; pantau saran</span>
+        </div>
+        <svg class="rarr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div id="adminForm">
+      <div class="afh">
+        <button class="btn btn-ghost btn-sm" onclick="hideAdminForm()">← Kembali</button>
+        <span class="aft" id="aft">Login OSIS</span>
+      </div>
+      <div class="fg"><label class="fl">Email</label><input type="email" id="einp" class="fi" placeholder="osis@sekolah.ac.id"></div>
+      <div class="fg" style="margin-bottom:16px"><label class="fl">Password</label><input type="password" id="pinp" class="fi" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginAdmin()"></div>
+      <button class="btn btn-primary btn-full" onclick="loginAdmin()">Masuk Sekarang</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div class="page" id="appScreen">
+  <div class="app-hdr">
+    <div class="app-hdr-l">
+      <h1>Kotak Saran <span>Digital</span></h1>
+      <p>Sampaikan aspirasimu secara anonim dan aman.</p>
+    </div>
+    <div class="upill">
+      <span class="pdot green" id="pdot"></span>
+      <span class="pname" id="pname">Siswa Anonim</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="chdr"><span class="ctit">Tulis Saran</span></div>
+    <div class="cwrap">
+      <textarea id="message" maxlength="300" placeholder="Apa yang ingin kamu sampaikan? Identitasmu terlindungi..." oninput="onMI()"></textarea>
+      <div class="cbottom"><span class="cc" id="cc">0 / 300</span></div>
+    </div>
+    <div id="prevWrap">
+      <img id="imgPrev" src="" alt="">
+      <div id="prevBar"><span class="pbadge" id="psz"></span><button class="brm" onclick="rmImg()">✕ Hapus foto</button></div>
+    </div>
+    <div class="uzone" id="uzone">
+      <input type="file" id="imgInp" accept="image/*" onchange="hImg(event)">
+      <div class="uzi">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div class="uzt"><strong>Pilih foto</strong> atau seret ke sini</div>
+        <div class="uzh">JPG · PNG · WEBP — maks. 5 MB</div>
+      </div>
+    </div>
+    <div class="cact">
+      <button class="btn btn-primary" id="submitBtn" onclick="submitPost()" style="flex:1;gap:9px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Kirim Saran Anonim
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="chdr"><span class="ctit">Statistik Saran</span></div>
+    <div class="bgrid">
+      <div class="btile"><span class="bnum hi" id="sT">0</span><span class="blbl">Total</span></div>
+      <div class="btile"><span class="bnum" id="sTd">0</span><span class="blbl">Hari Ini</span></div>
+      <div class="btile"><span class="bnum" id="sMo">0</span><span class="blbl">Bulan Ini</span></div>
+      <div class="btile"><span class="bnum" id="sY">0</span><span class="blbl">Tahun Ini</span></div>
+    </div>
+    <div class="cwrap2"><canvas id="chart"></canvas></div>
+  </div>
+
+  <div class="fhdr">
+    <span class="flbl" id="flbl">Saran Anda</span>
+    <span class="fcnt" id="fcnt">0 saran</span>
+  </div>
+  <div id="feed"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, arrayUnion, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+const fb = initializeApp({
+  apiKey:"AIzaSyDWwSToHIICBOxpw39z5eVGpvx1x0wBXRM",
+  authDomain:"osis-kotak-saran.firebaseapp.com",
+  projectId:"osis-kotak-saran",
+  storageBucket:"osis-kotak-saran.firebasestorage.app",
+  messagingSenderId:"756569969598",
+  appId:"1:756569969598:web:c58020f710028ce892dfef"
+});
+const db=getFirestore(fb), auth=getAuth(fb);
+
+/* ── STATE ── */
+window._pm={};
+let _b64=null,_role='siswa',_uid=null,_adminRole='',_unsub=null,_lastAct=0;
+const COOL=5000;
+
+/* ── SPAM ── */
+function sg(){const n=Date.now();if(n-_lastAct<COOL){toast(`⏳ Tunggu ${Math.ceil((COOL-(n-_lastAct))/1000)}d...`);return true;}_lastAct=n;return false;}
+
+/* ── FILTER ── */
+const BAD=['anjing','babi','kontol','bangsat','memek','anj','kntl','asu','ajg','goblok','tolol'];
+function cl(t){BAD.forEach(w=>{t=t.replace(new RegExp(`\\b${w}\\b`,'gi'),'****')});return t;}
+
+/* ── TOAST ── */
+let _tt;
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),3500);}
+window.toast=toast;
+
+/* ── LOAD ── */
+function sLoad(on,m='Memproses...'){document.getElementById('lov').classList.toggle('on',on);document.getElementById('lmsg').textContent=m;const b=document.getElementById('submitBtn');if(b)b.disabled=on;}
+
+/* ── LOGIN HELPERS ── */
+window.showAdminForm=r=>{_adminRole=r;document.getElementById('roleChoice').style.display='none';document.getElementById('adminForm').style.display='block';document.getElementById('aft').textContent=r==='osis'?'Login OSIS':'Login Guru';document.getElementById('einp').value='';document.getElementById('pinp').value='';setTimeout(()=>document.getElementById('einp').focus(),80);};
+window.hideAdminForm=()=>{document.getElementById('adminForm').style.display='none';document.getElementById('roleChoice').style.display='block';};
+
+/* ════════════════════════════════════════════
+   ENTER STUDENT
+   - Cek localStorage dulu untuk UID lama
+   - Kalau ada → re-sign-in anonymous dgn UID yang sama (pakai linkWithCredential atau signIn ulang)
+   - Simpan UID di localStorage agar saran tetap ada saat login ulang
+════════════════════════════════════════════ */
+window.enterStudent=async()=>{
+  sLoad(true,'Menyiapkan akun anonim...');
+  try{
+    let cred;
+    /* Cek apakah ada sesi aktif dari Firebase Auth persistence */
+    if(auth.currentUser&&auth.currentUser.isAnonymous){
+      /* Sudah punya sesi aktif */
+      cred={user:auth.currentUser};
+    } else {
+      /* Buat/ambil anonymous session baru */
+      cred=await signInAnonymously(auth);
+    }
+    _uid=cred.user.uid;
+    _role='siswa';
+    /* Simpan UID ke localStorage agar konsisten saat buka ulang */
+    localStorage.setItem('vo_anon_uid',_uid);
+    goToApp('Siswa Anonim','green');
+    toast('👋 Selamat datang! Saran Anda hanya bisa dilihat sendiri.');
+  }catch(e){
+    console.error(e);
+    toast('❌ Gagal masuk. Pastikan Anonymous Auth aktif di Firebase.');
+    sLoad(false);
+  }
+};
+
+/* ── LOGIN ADMIN ── */
+window.loginAdmin=async()=>{
+  const em=document.getElementById('einp').value.trim();
+  const pw=document.getElementById('pinp').value;
+  if(!em||!pw){toast('Isi email dan password!');return;}
+  sLoad(true,'Login...');
+  try{
+    const cred=await signInWithEmailAndPassword(auth,em,pw);
+    _uid=cred.user.uid;_role=_adminRole;
+    const lbl=_role==='osis'?'Pengurus OSIS':'Guru';
+    goToApp(lbl+' · '+em,_role==='guru'?'amber':'indigo');
+    toast(`✅ Login berhasil sebagai ${lbl}!`);
+  }catch(e){
+    console.error(e);toast('❌ Login gagal! Email atau password salah.');sLoad(false);
+  }
+};
+
+function goToApp(name,dot){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+  document.getElementById('pdot').className=`pdot ${dot}`;
+  document.getElementById('pname').textContent=name;
+  document.getElementById('tb-right').innerHTML=`<button class="btn btn-ghost" style="font-size:12px;padding:7px 13px" onclick="doLogout()">Keluar</button>`;
+  sLoad(false);
+  if(_role==='siswa'){
+    document.getElementById('flbl').textContent='Saran Anda';
+    listenSiswa();
+  } else {
+    document.getElementById('flbl').textContent='Semua Saran Siswa';
+    listenAdmin();
+  }
+}
+
+/* ── LOGOUT ── */
+window.doLogout=async()=>{
+  if(_unsub){_unsub();_unsub=null;}
+  try{await signOut(auth);}catch(_){}
+  _role='siswa';_uid=null;
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('adminForm').style.display='none';
+  document.getElementById('roleChoice').style.display='block';
+  document.getElementById('tb-right').innerHTML='';
+  render([],{});
+  toast('👋 Berhasil keluar.');
+};
+
+/* ── COUNTER ── */
+window.onMI=()=>{const l=document.getElementById('message').value.length;const e=document.getElementById('cc');e.textContent=`${l} / 300`;e.className='cc'+(l>250?' warn':'');};
+
+/* ── COMPRESS ── */
+function compress(file){
+  return new Promise((res,rej)=>{
+    if(!file.type.startsWith('image/'))return rej(new Error('Bukan gambar.'));
+    const r=new FileReader();
+    r.onerror=()=>rej(new Error('Gagal baca.'));
+    r.onload=ev=>{
+      const img=new Image();
+      img.onerror=()=>rej(new Error('Gambar tidak valid.'));
+      img.onload=()=>{
+        const MAX=900;let{width:w,height:h}=img;
+        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+        const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        let b=cv.toDataURL('image/jpeg',.72);
+        if(b.length>950000)b=cv.toDataURL('image/jpeg',.45);
+        if(b.length>1200000){cv.width=Math.round(w*.65);cv.height=Math.round(h*.65);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);b=cv.toDataURL('image/jpeg',.5);}
+        res(b);
+      };
+      img.src=ev.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+window.hImg=async ev=>{
+  const f=ev.target.files[0];if(!f)return;
+  if(f.size>5*1024*1024){toast('📏 Foto maks. 5 MB!');ev.target.value='';return;}
+  sLoad(true,'Mengompresi...');
+  try{const b=await compress(f);_b64=b;document.getElementById('imgPrev').src=b;document.getElementById('prevWrap').style.display='block';document.getElementById('uzone').style.display='none';document.getElementById('psz').textContent=`~${Math.round(b.length*.75/1024)} KB`;}
+  catch(e){toast('❌ '+e.message);_b64=null;}
+  finally{sLoad(false);}
+};
+window.rmImg=()=>{_b64=null;document.getElementById('imgInp').value='';document.getElementById('prevWrap').style.display='none';document.getElementById('uzone').style.display='';};
+
+/* ── LIGHTBOX ── */
+window.oLB=s=>{document.getElementById('lbimg').src=s;document.getElementById('lb').style.display='flex';};
+window.cLB=ev=>{if(!ev||ev.target!==document.getElementById('lbimg'))document.getElementById('lb').style.display='none';};
+
+/* ════════════════════════════════════════════
+   SUBMIT POST
+   
+   ARSITEKTUR DATA:
+   - Saran siswa disimpan di collection "posts"
+   - Field "ownerUid" berisi UID siswa pengirim
+   - Siswa hanya bisa lihat where("ownerUid","==",_uid)
+   - OSIS/Guru lihat semua posts tanpa filter ownerUid
+   - Dengan begitu OSIS/Guru BISA lihat semua saran siswa
+════════════════════════════════════════════ */
+window.submitPost=async()=>{
+  if(sg())return;
+  if(!_uid){toast('❌ Belum login.');return;}
+  const el=document.getElementById('message');
+  let txt=el.value.trim();
+  if(!txt){toast('✏️ Tuliskan sesuatu dulu!');return;}
+  txt=cl(txt);
+  sLoad(true,'Mengirim saran...');
+  try{
+    /* SEMUA saran (siswa maupun admin) masuk ke collection "posts"
+       dengan field ownerUid untuk memfilter per siswa */
+    await addDoc(collection(db,'posts'),{
+      text:txt,
+      image:_b64||null,
+      role:_role,
+      ownerUid:_uid,          /* UID pemilik saran */
+      likes:0,
+      comments:[],
+      date:serverTimestamp()
+    });
+    el.value='';rmImg();onMI();
+    toast('🎉 Saran berhasil terkirim!');
+  }catch(e){
+    console.error('submit error:',e);
+    toast('❌ Gagal kirim: '+e.message);
+  }finally{sLoad(false);}
+};
+
+/* ── LIKE ── */
+window.likePost=async(id)=>{
+  if(sg())return;
+  try{await updateDoc(doc(db,'posts',id),{likes:(window._pm[id]?.likes||0)+1});}
+  catch(e){toast('❌ Gagal like.');}
+};
+
+/* ── COMMENT ── */
+window.addComment=async(id)=>{
+  if(sg())return;
+  const inp=document.getElementById('ci-'+id);
+  const t=inp?.value.trim();if(!t)return;
+  try{
+    await updateDoc(doc(db,'posts',id),{comments:arrayUnion({text:cl(t),role:_role,date:new Date().toISOString()})});
+    inp.value='';toast('💬 Komentar terkirim!');
+  }catch(e){toast('❌ Gagal komentar.');}
+};
+
+/* ── DELETE ── */
+window.deletePost=async(id)=>{
+  if(!confirm('Hapus saran ini secara permanen?'))return;
+  sLoad(true,'Menghapus...');
+  try{await deleteDoc(doc(db,'posts',id));toast('🗑️ Saran dihapus.');}
+  catch(e){toast('❌ Gagal hapus.');}
+  finally{sLoad(false);}
+};
+
+/* ── STATS ── */
+function getStats(posts){
+  const now=new Date();let td=0,m=0,y=0;
+  posts.forEach(p=>{const d=p.date?new Date(p.date):null;if(!d)return;if(d.toDateString()===now.toDateString())td++;if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())m++;if(d.getFullYear()===now.getFullYear())y++;});
+  return{td,m,y,total:posts.length};
+}
+
+/* ── CHART ── */
+let _ch;
+function rChart(s){
+  const ctx=document.getElementById('chart').getContext('2d');
+  if(_ch)_ch.destroy();
+  _ch=new Chart(ctx,{type:'bar',data:{labels:['Total','Hari Ini','Bulan Ini','Tahun Ini'],datasets:[{data:[s.total,s.td,s.m,s.y],backgroundColor:['rgba(80,70,229,.75)','rgba(80,70,229,.4)','rgba(80,70,229,.4)','rgba(80,70,229,.4)'],borderColor:'rgba(80,70,229,.9)',borderWidth:1.5,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#111827',borderColor:'rgba(0,0,0,.08)',borderWidth:1,titleColor:'#f9fafb',bodyColor:'rgba(17,24,39,.5)',padding:10,cornerRadius:8}},scales:{x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'rgba(17,24,39,.35)',font:{size:11,family:'Inter'}},border:{color:'rgba(0,0,0,.05)'}},y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'rgba(17,24,39,.35)',font:{size:11,family:'Inter'},stepSize:1},border:{color:'rgba(0,0,0,.05)'}}}}});
+}
+
+/* ── RENDER ── */
+function rb(r){if(r==='osis')return`<span class="rb rb-o">OSIS</span>`;if(r==='guru')return`<span class="rb rb-g">Guru</span>`;return`<span class="rb rb-s">Siswa</span>`;}
+function avc(r){return r==='osis'?'av-o':r==='guru'?'av-g':'av-s';}
+function avi(r){return r==='osis'?'OS':r==='guru'?'GR':'AN';}
+function cbdg(r){const cls=r==='osis'?'rb-o':r==='guru'?'rb-g':'rb-s';const lbl=r==='osis'?'OSIS':r==='guru'?'Guru':'Anon';return`<span class="cb ${cls}">${lbl}</span>`;}
+
+function render(posts){
+  window._pm={};posts.forEach(p=>{window._pm[p.id]=p;});
+  const s=getStats(posts);
+  document.getElementById('sT').textContent=s.total;
+  document.getElementById('sTd').textContent=s.td;
+  document.getElementById('sMo').textContent=s.m;
+  document.getElementById('sY').textContent=s.y;
+  document.getElementById('fcnt').textContent=s.total+' saran';
+  rChart(s);
+  const feed=document.getElementById('feed');feed.innerHTML='';
+  if(!posts.length){
+    feed.innerHTML=`<div class="empty"><p style="font-size:28px;margin-bottom:10px;opacity:.3">💬</p><h3>Belum ada saran</h3><p>Jadilah yang pertama menyampaikan aspirasimu!</p></div>`;
+    return;
+  }
+  const canDel=(_role==='osis'||_role==='guru');
+  posts.forEach((p,i)=>{
+    const date=p.date?new Date(p.date).toLocaleString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Baru saja';
+    const imgH=p.image?`<img class="pimg" src="${p.image}" alt="" loading="lazy" onclick="oLB('${p.image}')">`:'' ;
+    const cmts=(p.comments||[]).map(c=>`<div class="ci">${cbdg(c.role||'siswa')} ${c.text}</div>`).join('');
+    const delBtn=canDel?`<button class="ab del" onclick="deletePost('${p.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Hapus</button>`:'';
+    const div=document.createElement('div');div.className='post';div.style.animationDelay=`${Math.min(i*.04,.3)}s`;
+    div.innerHTML=`
+      <div class="ptop">
+        <div class="pav ${avc(p.role)}">${avi(p.role)}</div>
+        <div class="pm"><strong>Anonim ${rb(p.role)}</strong><time>${date}</time></div>
+      </div>
+      <div class="pbody">${p.text}</div>
+      ${imgH}
+      <div class="pact">
+        <button class="ab" onclick="likePost('${p.id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${p.likes||0}</button>
+        <button class="ab"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${(p.comments||[]).length}</button>
+        ${delBtn}
+      </div>
+      <div class="cs">
+        <div class="cl">${cmts}</div>
+        <div class="crow"><input type="text" id="ci-${p.id}" class="cinp" placeholder="Tulis balasan..."><button class="btn btn-ghost btn-sm" onclick="addComment('${p.id}')">Kirim</button></div>
+      </div>`;
+    feed.appendChild(div);
+  });
+}
+
+/* ════════════════════════════════════════════
+   LISTEN SISWA — hanya saran milik UID ini
+   Firestore query: where("ownerUid","==",_uid)
+════════════════════════════════════════════ */
+function listenSiswa(){
+  if(_unsub){_unsub();_unsub=null;}
+  /* Query dengan filter ownerUid — hanya saran milik siswa ini */
+  const q=query(collection(db,'posts'),where('ownerUid','==',_uid),orderBy('date','desc'));
+  _unsub=onSnapshot(q,snap=>{
+    const posts=snap.docs.map(d=>({id:d.id,...d.data(),date:d.data().date?.toDate?d.data().date.toDate():null}));
+    render(posts);
+  },err=>{
+    console.error('listenSiswa error:',err);
+    /* Jika error karena index belum ada, tampilkan semua dan filter di client */
+    if(err.code==='failed-precondition'){
+      toast('⚠️ Memuat saran...');
+      /* Fallback: ambil semua posts lalu filter di client */
+      const q2=query(collection(db,'posts'),orderBy('date','desc'));
+      if(_unsub)_unsub();
+      _unsub=onSnapshot(q2,snap2=>{
+        const posts=snap2.docs
+          .map(d=>({id:d.id,...d.data(),date:d.data().date?.toDate?d.data().date.toDate():null}))
+          .filter(p=>p.ownerUid===_uid);
+        render(posts);
+      });
+    } else {
+      toast('❌ Gagal load: '+err.message);
+    }
+  });
+}
+
+/* ════════════════════════════════════════════
+   LISTEN ADMIN — semua posts tanpa filter
+   OSIS dan Guru bisa melihat semua saran siswa
+════════════════════════════════════════════ */
+function listenAdmin(){
+  if(_unsub){_unsub();_unsub=null;}
+  const q=query(collection(db,'posts'),orderBy('date','desc'));
+  _unsub=onSnapshot(q,snap=>{
+    const posts=snap.docs.map(d=>({id:d.id,...d.data(),date:d.data().date?.toDate?d.data().date.toDate():null}));
+    render(posts);
+  },err=>{console.error('listenAdmin error:',err);toast('❌ Gagal load: '+err.message);});
+}
+</script>
+</body>
+</html>
